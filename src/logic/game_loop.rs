@@ -52,6 +52,7 @@ impl Game {
         let new_board = self.board.make_move(self.current_player, next_move);
         if new_board.is_complete() {
             println!("Congratulations player {:?}, you win!", self.current_player);
+            println!("{new_board}");
             None
         } else if new_board.is_draw() {
             println!("The game ended in a draw.");
