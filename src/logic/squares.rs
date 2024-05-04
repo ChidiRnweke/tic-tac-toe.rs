@@ -46,13 +46,13 @@ impl fmt::Display for Board {
             f,
             "
   ------
-2 {t}
+3 {t}
   ------
-1 {c}
+2 {c}
   ------
-0 {b}
+1 {b}
   ------
-   0 1 2"
+   1 2 3"
         )
     }
 }
@@ -74,9 +74,9 @@ impl TryFrom<usize> for RowTarget {
 
     fn try_from(value: usize) -> Result<Self, Self::Error> {
         match value {
-            2 => Ok(RowTarget::Top),
-            1 => Ok(RowTarget::Center),
-            0 => Ok(RowTarget::Bottom),
+            3 => Ok(RowTarget::Top),
+            2 => Ok(RowTarget::Center),
+            1 => Ok(RowTarget::Bottom),
             _ => Err("An invalid move was given. The input must be 2 for Top, 1 for Center and 0 for bottom."),
         }
     }
@@ -97,10 +97,10 @@ impl TryFrom<usize> for ColumnTarget {
 
     fn try_from(value: usize) -> Result<Self, Self::Error> {
         match value {
-            2 => Ok(ColumnTarget::Right),
-            1 => Ok(ColumnTarget::Center),
-            0 => Ok(ColumnTarget::Left),
-            _ => Err("An invalid move was given. The input must be 2 for Right, 1 for Center and 0 for left."),
+            3 => Ok(ColumnTarget::Right),
+            2 => Ok(ColumnTarget::Center),
+            1 => Ok(ColumnTarget::Left),
+            _ => Err("An invalid move was given. The input must be 3 for Right, 2 for Center and 1 for left."),
         }
     }
 }
