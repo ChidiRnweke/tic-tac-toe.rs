@@ -1,3 +1,5 @@
+use core::fmt;
+
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub enum TileFill {
     X,
@@ -12,6 +14,46 @@ impl TileFill {
             TileFill::X => TileFill::O,
             TileFill::Empty => panic!("The current player cannot be empty."),
         }
+    }
+}
+
+impl fmt::Display for TileFill {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_rep = match self {
+            TileFill::Empty => " ",
+            TileFill::O => "O",
+            TileFill::X => "X",
+        };
+        write!(f, "{string_rep}")
+    }
+}
+
+impl fmt::Display for Row {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let l = &self.tiles[0];
+        let c = &self.tiles[1];
+        let r = &self.tiles[2];
+        write!(f, "|{l}|{c}|{r}|")
+    }
+}
+
+impl fmt::Display for Board {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let b = &self.rows[0];
+        let c = &self.rows[1];
+        let t = &self.rows[2];
+        write!(
+            f,
+            "
+  ------
+2 {t}
+  ------
+1 {c}
+  ------
+0 {b}
+  ------
+   0 1 2"
+        )
     }
 }
 
@@ -154,7 +196,7 @@ impl Board {
     }
 
     pub fn is_complete(&self) -> bool {
-        self.any_row_complete() || self.any_diagonal_complete()
+        self.any_row_complete() || self.any_diagonal_complete() || self.any_vertical_complete()
     }
 
     pub fn is_draw(&self) -> bool {
@@ -168,6 +210,11 @@ impl Board {
     fn any_diagonal_complete(&self) -> bool {
         let (diag1, diag2) = self.make_diagonals();
         diag1.is_complete() || diag2.is_complete()
+    }
+
+    fn any_vertical_complete(&self) -> bool {
+        let (vert1, vert2, vert3) = self.make_verticals();
+        vert1.is_complete() || vert2.is_complete() || vert3.is_complete()
     }
 
     fn make_diagonals(&self) -> (Diagonal, Diagonal) {
@@ -187,5 +234,31 @@ impl Board {
             ],
         };
         (diag_1, diag_2)
+    }
+
+    fn make_verticals(&self) -> (Diagonal, Diagonal, Diagonal) {
+        let vert_1 = Diagonal {
+            tiles: [
+                &self.rows[0].tiles[0],
+                &self.rows[1].tiles[0],
+                &self.rows[2].tiles[0],
+            ],
+        };
+        let vert_2 = Diagonal {
+            tiles: [
+                &self.rows[0].tiles[1],
+                &self.rows[1].tiles[1],
+                &self.rows[2].tiles[1],
+            ],
+        };
+
+        let vert_3 = Diagonal {
+            tiles: [
+                &self.rows[0].tiles[2],
+                &self.rows[1].tiles[2],
+                &self.rows[2].tiles[2],
+            ],
+        };
+        (vert_1, vert_2, vert_3)
     }
 }

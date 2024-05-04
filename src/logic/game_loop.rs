@@ -1,11 +1,19 @@
 use crate::logic::squares::RowTarget;
 
 use super::squares::{Board, ColumnTarget, TileFill, ValidMove};
+use core::fmt;
 use std::io;
 
 pub struct Game {
     board: Board,
     current_player: TileFill,
+}
+
+impl fmt::Display for Game {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let board = &self.board;
+        write!(f, "{board}")
+    }
 }
 
 fn read_input() -> String {
@@ -24,12 +32,16 @@ impl Game {
         let game = Game {
             board: Board::new(),
             current_player: TileFill::O,
-        }
-        .next_turn();
-        Game::game_loop(game)
+        };
+        println!("Player {}'s turn.", TileFill::O);
+        println!("{game}");
+        Game::game_loop(game.next_turn())
     }
+
     fn game_loop(maybe_next: Option<Game>) {
         if let Some(not_finished) = maybe_next {
+            println!("Player {}'s turn.", &not_finished.current_player);
+            println!("{not_finished}");
             let next = not_finished.next_turn();
             Game::game_loop(next);
         }
