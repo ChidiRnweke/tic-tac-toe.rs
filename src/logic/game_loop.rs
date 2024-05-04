@@ -30,7 +30,8 @@ impl Game {
     }
     fn game_loop(maybe_next: Option<Game>) {
         if let Some(not_finished) = maybe_next {
-            not_finished.next_turn();
+            let next = not_finished.next_turn();
+            Game::game_loop(next);
         }
     }
 
@@ -71,18 +72,26 @@ impl Game {
     fn read_column() -> ColumnTarget {
         println!("What column do you want to place the tile in?");
         let col = read_input();
-        col.parse::<usize>()
+        col.trim()
+            .parse::<usize>()
             .map_err(|_| "The number you gave was invalid. Try again.")
             .and_then(|num| ColumnTarget::try_from(num))
-            .unwrap_or_else(|_| Game::read_column())
+            .unwrap_or_else(|err| {
+                println!("{err}");
+                Game::read_column()
+            })
     }
 
     fn read_row() -> RowTarget {
         println!("What row do you want to place the tile in?");
         let col = read_input();
-        col.parse::<usize>()
+        col.trim()
+            .parse::<usize>()
             .map_err(|_| "The number you gave was invalid. Try again.")
             .and_then(|num| RowTarget::try_from(num))
-            .unwrap_or_else(|_| Game::read_row())
+            .unwrap_or_else(|err| {
+                println!("{err}");
+                Game::read_row()
+            })
     }
 }
