@@ -73,19 +73,19 @@ impl From<&ColumnTarget> for usize {
     }
 }
 
-pub struct ValidMove<'a> {
-    row: &'a RowTarget,
-    col: &'a ColumnTarget,
+pub struct ValidMove {
+    row: RowTarget,
+    col: ColumnTarget,
 }
 
-impl<'a> ValidMove<'a> {
+impl ValidMove {
     pub fn new(
         board: &Board,
-        row_target: &'a RowTarget,
-        col_target: &'a ColumnTarget,
-    ) -> Option<ValidMove<'a>> {
-        let row_num: usize = row_target.into();
-        let col_num: usize = col_target.into();
+        row_target: RowTarget,
+        col_target: ColumnTarget,
+    ) -> Option<ValidMove> {
+        let row_num = usize::from(&row_target);
+        let col_num: usize = usize::from(&col_target);
         let row = &board.rows[row_num];
         let col = &row.tiles[col_num];
 
@@ -146,10 +146,10 @@ impl Board {
     }
 
     pub fn make_move(&self, player: TileFill, player_move: ValidMove) -> Board {
-        let col: usize = player_move.col.into();
-        let row: usize = player_move.row.into();
+        let row_num = usize::from(&player_move.row);
+        let col_num: usize = usize::from(&player_move.col);
         let mut new_board = self.clone();
-        new_board.rows[row].tiles[col] = player;
+        new_board.rows[row_num].tiles[col_num] = player;
         new_board
     }
 
