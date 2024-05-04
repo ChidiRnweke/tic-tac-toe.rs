@@ -16,9 +16,9 @@ impl TileFill {
 }
 
 pub enum RowTarget {
-    Top,
-    Center,
     Bottom,
+    Center,
+    Top,
 }
 
 pub enum ColumnTarget {
