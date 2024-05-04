@@ -1,19 +1,10 @@
-use crate::logic::squares::RowTarget;
-
 use super::squares::{Board, ColumnTarget, TileFill, ValidMove};
-use core::fmt;
+use crate::logic::squares::RowTarget;
 use std::io;
 
 pub struct Game {
-    board: Board,
+    pub board: Board,
     current_player: TileFill,
-}
-
-impl fmt::Display for Game {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let board = &self.board;
-        write!(f, "{board}")
-    }
 }
 
 fn read_input() -> String {

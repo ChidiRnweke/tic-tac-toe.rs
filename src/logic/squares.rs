@@ -1,5 +1,3 @@
-use core::fmt;
-
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub enum TileFill {
     X,
@@ -14,46 +12,6 @@ impl TileFill {
             TileFill::X => TileFill::O,
             TileFill::Empty => panic!("The current player cannot be empty."),
         }
-    }
-}
-
-impl fmt::Display for TileFill {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let string_rep = match self {
-            TileFill::Empty => " ",
-            TileFill::O => "O",
-            TileFill::X => "X",
-        };
-        write!(f, "{string_rep}")
-    }
-}
-
-impl fmt::Display for Row {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let l = &self.tiles[0];
-        let c = &self.tiles[1];
-        let r = &self.tiles[2];
-        write!(f, "|{l}|{c}|{r}|")
-    }
-}
-
-impl fmt::Display for Board {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let b = &self.rows[0];
-        let c = &self.rows[1];
-        let t = &self.rows[2];
-        write!(
-            f,
-            "
-  ------
-3 {t}
-  ------
-2 {c}
-  ------
-1 {b}
-  ------
-   1 2 3"
-        )
     }
 }
 
@@ -143,8 +101,8 @@ impl ValidMove {
 }
 
 #[derive(Clone)]
-struct Row {
-    tiles: [TileFill; 3],
+pub struct Row {
+    pub tiles: [TileFill; 3],
 }
 
 struct Diagonal<'a> {
@@ -177,7 +135,7 @@ impl Diagonal<'_> {
 
 #[derive(Clone)]
 pub struct Board {
-    rows: [Row; 3],
+    pub rows: [Row; 3],
 }
 
 impl Board {
