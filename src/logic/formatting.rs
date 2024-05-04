@@ -24,7 +24,7 @@ impl fmt::Display for TileFill {
 
 impl fmt::Display for Row {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let [l, r, c] = &self.tiles;
+        let [l, c, r] = &self.tiles;
         write!(f, "|{l}|{c}|{r}|")
     }
 }
