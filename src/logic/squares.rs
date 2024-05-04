@@ -105,7 +105,7 @@ pub struct Row {
     pub tiles: [TileFill; 3],
 }
 
-struct Diagonal<'a> {
+struct RowReference<'a> {
     tiles: [&'a TileFill; 3],
 }
 
@@ -126,7 +126,7 @@ impl Row {
     }
 }
 
-impl Diagonal<'_> {
+impl RowReference<'_> {
     fn is_complete(&self) -> bool {
         self.tiles.iter().all(|&tile| *tile == TileFill::X)
             || self.tiles.iter().all(|&tile| *tile == TileFill::O)
@@ -175,8 +175,8 @@ impl Board {
         vert1.is_complete() || vert2.is_complete() || vert3.is_complete()
     }
 
-    fn make_diagonals(&self) -> (Diagonal, Diagonal) {
-        let diag_1 = Diagonal {
+    fn make_diagonals(&self) -> (RowReference, RowReference) {
+        let diag_1 = RowReference {
             tiles: [
                 &self.rows[0].tiles[0],
                 &self.rows[1].tiles[1],
@@ -184,7 +184,7 @@ impl Board {
             ],
         };
 
-        let diag_2 = Diagonal {
+        let diag_2 = RowReference {
             tiles: [
                 &self.rows[0].tiles[2],
                 &self.rows[1].tiles[1],
@@ -194,15 +194,15 @@ impl Board {
         (diag_1, diag_2)
     }
 
-    fn make_verticals(&self) -> (Diagonal, Diagonal, Diagonal) {
-        let vert_1 = Diagonal {
+    fn make_verticals(&self) -> (RowReference, RowReference, RowReference) {
+        let vert_1 = RowReference {
             tiles: [
                 &self.rows[0].tiles[0],
                 &self.rows[1].tiles[0],
                 &self.rows[2].tiles[0],
             ],
         };
-        let vert_2 = Diagonal {
+        let vert_2 = RowReference {
             tiles: [
                 &self.rows[0].tiles[1],
                 &self.rows[1].tiles[1],
@@ -210,7 +210,7 @@ impl Board {
             ],
         };
 
-        let vert_3 = Diagonal {
+        let vert_3 = RowReference {
             tiles: [
                 &self.rows[0].tiles[2],
                 &self.rows[1].tiles[2],
