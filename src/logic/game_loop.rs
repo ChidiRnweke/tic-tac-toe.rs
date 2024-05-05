@@ -1,5 +1,7 @@
 use super::squares::{Board, ColumnTarget, TileFill, ValidMove};
 use crate::logic::squares::RowTarget;
+use ansi_term::Colour::Green;
+
 use std::{fmt, io};
 
 pub struct Game {
@@ -42,7 +44,12 @@ impl Game {
         let next_move = self.make_valid_move();
         let new_board = self.board.make_move(self.current_player, &next_move);
         if new_board.is_complete() {
-            println!("Congratulations player {:?}, you win!", self.current_player);
+            println!(
+                "{} {:?}, {}",
+                Green.paint("Congratulations player"),
+                self.current_player,
+                Green.paint("you win!")
+            );
             println!("{new_board}");
             None
         } else if new_board.is_draw() {
