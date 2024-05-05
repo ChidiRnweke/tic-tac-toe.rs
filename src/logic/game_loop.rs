@@ -1,6 +1,6 @@
 use super::squares::{Board, ColumnTarget, TileFill, ValidMove};
 use crate::logic::squares::RowTarget;
-use std::io;
+use std::{fmt, io};
 
 pub struct Game {
     pub board: Board,
@@ -97,5 +97,11 @@ impl Game {
                 println!("{err}");
                 Self::read_row()
             })
+    }
+}
+
+impl fmt::Display for Game {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", &self.board)
     }
 }

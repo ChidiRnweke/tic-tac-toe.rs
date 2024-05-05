@@ -1,3 +1,5 @@
+use core::fmt;
+
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum TileFill {
     X,
@@ -83,9 +85,9 @@ impl ValidMove {
         let row_num = usize::from(&row_target);
         let col_num: usize = usize::from(&col_target);
         let row = &board.rows[row_num];
-        let col = &row.tiles[col_num];
+        let target_tile = &row.tiles[col_num];
 
-        if *col == TileFill::Empty {
+        if *target_tile == TileFill::Empty {
             Some(Self {
                 row: row_target,
                 col: col_target,
@@ -97,8 +99,8 @@ impl ValidMove {
 }
 
 #[derive(Clone)]
-pub struct Row {
-    pub tiles: [TileFill; 3],
+struct Row {
+    tiles: [TileFill; 3],
 }
 
 struct RowReference<'a> {
@@ -131,7 +133,7 @@ impl RowReference<'_> {
 
 #[derive(Clone)]
 pub struct Board {
-    pub rows: [Row; 3],
+    rows: [Row; 3],
 }
 
 impl Default for Board {
@@ -215,5 +217,41 @@ impl Board {
             ],
         };
         (vert_1, vert_2, vert_3)
+    }
+}
+
+impl fmt::Display for TileFill {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let string_rep = match self {
+            Self::Empty => " ",
+            Self::O => "O",
+            Self::X => "X",
+        };
+        write!(f, "{string_rep}")
+    }
+}
+
+impl fmt::Display for Row {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let [l, c, r] = &self.tiles;
+        write!(f, "|{l}|{c}|{r}|")
+    }
+}
+
+impl fmt::Display for Board {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let [b, c, t] = &self.rows;
+        write!(
+            f,
+            "
+  ------
+3 {t}
+  ------
+2 {c}
+  ------
+1 {b}
+  ------
+   1 2 3"
+        )
     }
 }
