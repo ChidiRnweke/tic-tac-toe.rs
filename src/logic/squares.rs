@@ -1,4 +1,4 @@
-#[derive(Clone, Copy, PartialEq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum TileFill {
     X,
     O,
@@ -6,11 +6,11 @@ pub enum TileFill {
 }
 
 impl TileFill {
-    pub fn get_next_player(&self) -> TileFill {
+    pub fn get_next_player(self) -> Self {
         match self {
-            TileFill::O => TileFill::X,
-            TileFill::X => TileFill::O,
-            TileFill::Empty => panic!("The current player cannot be empty."),
+            Self::O => Self::X,
+            Self::X => Self::O,
+            Self::Empty => panic!("The current player cannot be empty."),
         }
     }
 }
@@ -32,9 +32,9 @@ impl TryFrom<usize> for RowTarget {
 
     fn try_from(value: usize) -> Result<Self, Self::Error> {
         match value {
-            3 => Ok(RowTarget::Top),
-            2 => Ok(RowTarget::Center),
-            1 => Ok(RowTarget::Bottom),
+            3 => Ok(Self::Top),
+            2 => Ok(Self::Center),
+            1 => Ok(Self::Bottom),
             _ => Err("An invalid move was given. The input must be 2 for Top, 1 for Center and 0 for bottom."),
         }
     }
@@ -55,9 +55,9 @@ impl TryFrom<usize> for ColumnTarget {
 
     fn try_from(value: usize) -> Result<Self, Self::Error> {
         match value {
-            3 => Ok(ColumnTarget::Right),
-            2 => Ok(ColumnTarget::Center),
-            1 => Ok(ColumnTarget::Left),
+            3 => Ok(Self::Right),
+            2 => Ok(Self::Center),
+            1 => Ok(Self::Left),
             _ => Err("An invalid move was given. The input must be 3 for Right, 2 for Center and 1 for left."),
         }
     }
@@ -79,18 +79,14 @@ pub struct ValidMove {
 }
 
 impl ValidMove {
-    pub fn new(
-        board: &Board,
-        row_target: RowTarget,
-        col_target: ColumnTarget,
-    ) -> Option<ValidMove> {
+    pub fn new(board: &Board, row_target: RowTarget, col_target: ColumnTarget) -> Option<Self> {
         let row_num = usize::from(&row_target);
         let col_num: usize = usize::from(&col_target);
         let row = &board.rows[row_num];
         let col = &row.tiles[col_num];
 
-        if let TileFill::Empty = col {
-            Some(ValidMove {
+        if *col == TileFill::Empty {
+            Some(Self {
                 row: row_target,
                 col: col_target,
             })
@@ -110,7 +106,7 @@ struct RowReference<'a> {
 }
 
 impl Row {
-    fn new() -> Self {
+    const fn new() -> Self {
         Self {
             tiles: [TileFill::Empty; 3],
         }
@@ -138,14 +134,15 @@ pub struct Board {
     pub rows: [Row; 3],
 }
 
-impl Board {
-    pub fn new() -> Self {
+impl Default for Board {
+    fn default() -> Self {
         Self {
             rows: [Row::new(), Row::new(), Row::new()],
         }
     }
-
-    pub fn make_move(&self, player: TileFill, player_move: ValidMove) -> Board {
+}
+impl Board {
+    pub fn make_move(&self, player: TileFill, player_move: &ValidMove) -> Self {
         let row_num = usize::from(&player_move.row);
         let col_num: usize = usize::from(&player_move.col);
         let mut new_board = self.clone();
@@ -158,11 +155,11 @@ impl Board {
     }
 
     pub fn is_draw(&self) -> bool {
-        !self.rows.iter().any(|row| row.is_not_full())
+        !self.rows.iter().any(Row::is_not_full)
     }
 
     fn any_row_complete(&self) -> bool {
-        self.rows.iter().any(|row| row.is_complete())
+        self.rows.iter().any(Row::is_complete)
     }
 
     fn any_diagonal_complete(&self) -> bool {
@@ -175,7 +172,7 @@ impl Board {
         vert1.is_complete() || vert2.is_complete() || vert3.is_complete()
     }
 
-    fn make_diagonals(&self) -> (RowReference, RowReference) {
+    const fn make_diagonals(&self) -> (RowReference, RowReference) {
         let diag_1 = RowReference {
             tiles: [
                 &self.rows[0].tiles[0],
@@ -194,7 +191,7 @@ impl Board {
         (diag_1, diag_2)
     }
 
-    fn make_verticals(&self) -> (RowReference, RowReference, RowReference) {
+    const fn make_verticals(&self) -> (RowReference, RowReference, RowReference) {
         let vert_1 = RowReference {
             tiles: [
                 &self.rows[0].tiles[0],

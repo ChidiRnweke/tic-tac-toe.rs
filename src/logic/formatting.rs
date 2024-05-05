@@ -14,9 +14,9 @@ impl fmt::Display for Game {
 impl fmt::Display for TileFill {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let string_rep = match self {
-            TileFill::Empty => " ",
-            TileFill::O => "O",
-            TileFill::X => "X",
+            Self::Empty => " ",
+            Self::O => "O",
+            Self::X => "X",
         };
         write!(f, "{string_rep}")
     }

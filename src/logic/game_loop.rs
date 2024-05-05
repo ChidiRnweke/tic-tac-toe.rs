@@ -20,27 +20,27 @@ fn read_input() -> String {
 
 impl Game {
     pub fn start_game() {
-        let game = Game {
-            board: Board::new(),
+        let game = Self {
+            board: Board::default(),
             current_player: TileFill::O,
         };
         println!("Player {}'s turn.", TileFill::O);
         println!("{game}");
-        Game::game_loop(game.next_turn())
+        Self::game_loop(game.next_turn());
     }
 
-    fn game_loop(maybe_next: Option<Game>) {
+    fn game_loop(maybe_next: Option<Self>) {
         if let Some(not_finished) = maybe_next {
             println!("Player {}'s turn.", &not_finished.current_player);
             println!("{not_finished}");
             let next = not_finished.next_turn();
-            Game::game_loop(next);
+            Self::game_loop(next);
         }
     }
 
     fn next_turn(&self) -> Option<Self> {
         let next_move = self.make_valid_move();
-        let new_board = self.board.make_move(self.current_player, next_move);
+        let new_board = self.board.make_move(self.current_player, &next_move);
         if new_board.is_complete() {
             println!("Congratulations player {:?}, you win!", self.current_player);
             println!("{new_board}");
@@ -49,7 +49,7 @@ impl Game {
             println!("The game ended in a draw.");
             None
         } else {
-            Some(Game {
+            Some(Self {
                 board: new_board,
                 current_player: self.current_player.get_next_player(),
             })
@@ -57,20 +57,20 @@ impl Game {
     }
 
     fn make_move(&self) -> Option<ValidMove> {
-        let column = Game::read_column();
-        let row = Game::read_row();
+        let column: ColumnTarget = Self::read_column();
+        let row = Self::read_row();
         ValidMove::new(&self.board, row, column)
     }
 
     fn make_valid_move(&self) -> ValidMove {
         let potential_move = self.make_move();
-        match potential_move {
-            None => {
+        potential_move.map_or_else(
+            || {
                 println!("You must select a tile that is empty. Try again.");
                 self.make_valid_move()
-            }
-            Some(valid_move) => valid_move,
-        }
+            },
+            |valid_move| valid_move,
+        )
     }
 
     fn read_column() -> ColumnTarget {
@@ -79,10 +79,10 @@ impl Game {
         col.trim()
             .parse::<usize>()
             .map_err(|_| "The number you gave was invalid. Try again.")
-            .and_then(|num| ColumnTarget::try_from(num))
+            .and_then(ColumnTarget::try_from)
             .unwrap_or_else(|err| {
                 println!("{err}");
-                Game::read_column()
+                Self::read_column()
             })
     }
 
@@ -92,10 +92,10 @@ impl Game {
         col.trim()
             .parse::<usize>()
             .map_err(|_| "The number you gave was invalid. Try again.")
-            .and_then(|num| RowTarget::try_from(num))
+            .and_then(RowTarget::try_from)
             .unwrap_or_else(|err| {
                 println!("{err}");
-                Game::read_row()
+                Self::read_row()
             })
     }
 }
