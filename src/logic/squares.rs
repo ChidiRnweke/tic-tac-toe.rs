@@ -1,5 +1,5 @@
+use ansi_term::Colour::{Blue, Red};
 use core::fmt;
-
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum TileFill {
     X,
@@ -17,12 +17,14 @@ impl TileFill {
     }
 }
 
+#[cfg_attr(test, derive(PartialEq, Debug))]
 pub enum RowTarget {
     Bottom,
     Center,
     Top,
 }
 
+#[cfg_attr(test, derive(PartialEq, Debug))]
 pub enum ColumnTarget {
     Left,
     Center,
@@ -222,10 +224,13 @@ impl Board {
 
 impl fmt::Display for TileFill {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let o = &Red.paint("O").to_string();
+        let x = &Blue.paint("X").to_string();
+
         let string_rep = match self {
             Self::Empty => " ",
-            Self::O => "O",
-            Self::X => "X",
+            Self::O => o,
+            Self::X => x,
         };
         write!(f, "{string_rep}")
     }
@@ -253,5 +258,110 @@ impl fmt::Display for Board {
   ------
    1 2 3"
         )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn next_player_should_correctly_be_set() {
+        assert_eq!(TileFill::X.get_next_player(), TileFill::O);
+        assert_eq!(TileFill::O.get_next_player(), TileFill::X);
+    }
+
+    #[test]
+    fn row_numbers_are_mapped_to_correct_target() {
+        assert_eq!(RowTarget::try_from(3).unwrap(), RowTarget::Top);
+        assert_eq!(RowTarget::try_from(2).unwrap(), RowTarget::Center);
+        assert_eq!(RowTarget::try_from(1).unwrap(), RowTarget::Bottom);
+    }
+
+    #[test]
+    fn incorrect_row_numbers_should_panic() {
+        assert!(RowTarget::try_from(0).is_err());
+    }
+
+    #[test]
+    fn column_numbers_are_mapped_to_correct_target() {
+        assert_eq!(ColumnTarget::try_from(3).unwrap(), ColumnTarget::Right);
+        assert_eq!(ColumnTarget::try_from(2).unwrap(), ColumnTarget::Center);
+        assert_eq!(ColumnTarget::try_from(1).unwrap(), ColumnTarget::Left);
+    }
+
+    #[test]
+    fn incorrect_col_number_should_panic() {
+        assert!(ColumnTarget::try_from(0).is_err());
+    }
+
+    #[test]
+    fn making_a_move_on_empty_tile_is_valid() {
+        let board = Board::default();
+        let valid_move = ValidMove::new(&board, RowTarget::Bottom, ColumnTarget::Left);
+        assert!(valid_move.is_some());
+    }
+
+    #[test]
+    fn making_a_move_on_nonempty_tile_is_invalid() {
+        let board = Board::default();
+        let valid = ValidMove::new(&board, RowTarget::Top, ColumnTarget::Right).unwrap();
+        let new_board = board.make_move(TileFill::X, &valid);
+        let invalid_move = ValidMove::new(&new_board, RowTarget::Top, ColumnTarget::Right);
+        assert!(invalid_move.is_none());
+    }
+
+    #[test]
+    fn moves_should_be_made_correctly() {
+        let board = Board::default();
+        let valid_move = ValidMove {
+            row: RowTarget::try_from(1).unwrap(),
+            col: ColumnTarget::try_from(1).unwrap(),
+        };
+        let updated_board = board.make_move(TileFill::X, &valid_move);
+        assert_eq!(updated_board.rows[0].tiles[0], TileFill::X);
+    }
+
+    #[test]
+    fn test_board_horizontal_complete() {
+        let mut board = Board::default();
+        board.rows[0].tiles = [TileFill::X, TileFill::X, TileFill::X];
+        assert!(board.is_complete());
+    }
+
+    #[test]
+    fn test_board_vertical_complete() {
+        let mut board = Board::default();
+        board.rows[0].tiles[0] = TileFill::X;
+        board.rows[0].tiles[1] = TileFill::X;
+        board.rows[0].tiles[2] = TileFill::X;
+        assert!(board.is_complete());
+    }
+
+    #[test]
+    fn test_board_diagonal1_complete() {
+        let mut board = Board::default();
+        board.rows[0].tiles[0] = TileFill::X;
+        board.rows[1].tiles[1] = TileFill::X;
+        board.rows[2].tiles[2] = TileFill::X;
+        assert!(board.is_complete());
+    }
+
+    #[test]
+    fn test_board_diagonal2_complete() {
+        let mut board = Board::default();
+        board.rows[0].tiles[2] = TileFill::X;
+        board.rows[1].tiles[1] = TileFill::X;
+        board.rows[2].tiles[0] = TileFill::X;
+        assert!(board.is_complete());
+    }
+
+    #[test]
+    fn test_board_is_draw() {
+        let mut board = Board::default();
+        for row in board.rows.iter_mut() {
+            row.tiles = [TileFill::X, TileFill::O, TileFill::X];
+        }
+        assert!(board.is_draw());
     }
 }
